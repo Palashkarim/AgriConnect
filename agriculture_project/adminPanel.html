@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chart-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Admin Panel</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="logout.php">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Demand Pie Chart -->
+    <div class="container chart-container">
+        <h2 class="chart-title">Product Demand (Pie Chart)</h2>
+        <canvas id="demandChart"></canvas>
+    </div>
+
+    <!-- Supply Bar Chart -->
+    <div class="container chart-container">
+        <h2 class="chart-title">Product Supply (Bar Chart)</h2>
+        <canvas id="supplyChart"></canvas>
+    </div>
+
+    <!-- Price Trend Line Chart -->
+    <div class="container chart-container">
+        <h2 class="chart-title">Product Price Trends (Line Chart)</h2>
+        <canvas id="priceChart"></canvas>
+    </div>
+
+    <!-- JavaScript to Fetch Data and Render Charts -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Fetch and render Demand Pie Chart
+            fetch('fetch_demand_data.php')
+                .then(response => response.json())
+                .then(data => {
+                    const labels = data.map(item => item.product_name);
+                    const values = data.map(item => item.demand_quantity);
+
+                    new Chart(document.getElementById('demandChart').getContext('2d'), {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Product Demand',
+                                data: values,
+                                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                            }]
+                        }
+                    });
+                });
+
+            // Fetch and render Supply Bar Chart
+            fetch('fetch_supply_data.php')
+                .then(response => response.json())
+                .then(data => {
+                    const labels = data.map(item => item.product_name);
+                    const values = data.map(item => item.supply_quantity);
+
+                    new Chart(document.getElementById('supplyChart').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Product Supply',
+                                data: values,
+                                backgroundColor: '#36A2EB',
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
+
+            // Fetch and render Price Trend Line Chart
+            fetch('fetch_price_data.php')
+                .then(response => response.json())
+                .then(data => {
+                    const labels = data.map(item => item.date);
+                    const values = data.map(item => item.price);
+
+                    new Chart(document.getElementById('priceChart').getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Product Price',
+                                data: values,
+                                borderColor: '#FF6384',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        }
+                    });
+                });
+        });
+    </script>
+</body>
+</html>
